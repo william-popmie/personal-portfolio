@@ -1,5 +1,5 @@
 import ConsoleGreeting from "@/components/ConsoleGreeting";
-import HorizontalStory from "@/components/story/HorizontalStory";
+import SlideDeck from "@/components/story/SlideDeck";
 import Intro from "@/components/story/panels/Intro";
 import Startups from "@/components/story/panels/Startups";
 import Hackathons from "@/components/story/panels/Hackathons";
@@ -16,20 +16,20 @@ export default function Home() {
       {/* fixed minimal brand */}
       <a
         href={`mailto:${site.email}`}
-        className="kicker fixed right-4 top-4 z-40 hidden text-foreground transition-colors hover:text-accent sm:block"
+        className="kicker fixed left-4 top-4 z-40 hidden text-foreground transition-colors hover:text-accent sm:block"
       >
         Hire me →
       </a>
 
       <main>
-        <HorizontalStory>
+        <SlideDeck>
           <Intro />
           <Startups />
           <Hackathons />
           <Built />
           <Robotics />
           <Contact />
-        </HorizontalStory>
+        </SlideDeck>
       </main>
     </>
   );

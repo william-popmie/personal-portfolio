@@ -7,7 +7,7 @@ import { site } from "@/data/site";
 export default function ConsoleGreeting() {
   useEffect(() => {
     const style =
-      "color:#3b82f6;font-weight:700;font-size:13px;font-family:monospace";
+      "color:#2f6bff;font-weight:700;font-size:13px;font-family:monospace";
     // eslint-disable-next-line no-console
     console.log("%cyou found the console. respect.", style);
     // eslint-disable-next-line no-console

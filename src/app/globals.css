@@ -6,8 +6,8 @@
   --background-soft: #0d0d0d;
   --foreground: #f2f0ea;
   --muted: #87847c;
-  --border: #232220;
-  --accent: #ff3b30;
+  --border: #1f2230;
+  --accent: #2f6bff;
 }
 
 @theme inline {
@@ -23,6 +23,14 @@
 
 html {
   background: var(--background);
+  scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-snap-type: none;
+    scroll-behavior: auto;
+  }
 }
 
 body {

@@ -8,7 +8,12 @@ const links = [
 
 export default function Contact() {
   return (
-    <section className="relative flex min-h-screen w-full flex-col justify-between px-6 py-16 sm:px-12 lg:px-20">
+    <section
+      id="contact"
+      data-slide
+      data-label="Contact"
+      className="relative flex min-h-screen w-full snap-start flex-col justify-between px-6 py-16 sm:px-12 lg:px-20"
+    >
       <div className="bg-lines pointer-events-none absolute inset-0 opacity-[0.35]" />
 
       <div className="relative flex items-center gap-4">

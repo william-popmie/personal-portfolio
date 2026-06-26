@@ -2,7 +2,12 @@ import { site } from "@/data/site";
 
 export default function Intro() {
   return (
-    <section className="relative flex min-h-screen w-full flex-col justify-between px-6 py-16 sm:px-12 lg:px-20">
+    <section
+      id="intro"
+      data-slide
+      data-label="Intro"
+      className="relative flex min-h-screen w-full snap-start flex-col justify-between px-6 py-16 sm:px-12 lg:px-20"
+    >
       <div className="bg-lines pointer-events-none absolute inset-0 opacity-[0.35]" />
 
       <div className="relative flex items-center justify-between">
@@ -11,7 +16,7 @@ export default function Intro() {
       </div>
 
       <div className="relative">
-        <h1 className="display text-[15vw] leading-[0.86] sm:text-[12vw] lg:text-[9.5vw]">
+        <h1 className="display text-[12.5vw] leading-[0.86] sm:text-[12vw] lg:text-[9.5vw]">
           William
           <br />
           Ragnarsson
@@ -27,7 +32,7 @@ export default function Intro() {
         <p className="kicker flex items-center gap-3 text-foreground">
           scroll
           <span className="inline-block h-px w-12 bg-accent" />
-          <span className="text-accent">→</span>
+          <span className="text-accent">↓</span>
         </p>
       </div>
     </section>
