@@ -72,26 +72,6 @@ html {
   text-transform: uppercase;
 }
 
-/* map panel crossfade on city change */
-@keyframes fadeSwap {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-.fade-swap {
-  animation: fadeSwap 0.35s ease both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .fade-swap {
-    animation: none;
-  }
-}
-
 /* map dot pulse */
 @keyframes pulse-ring {
   0% {

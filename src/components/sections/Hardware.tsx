@@ -9,20 +9,19 @@ export default function Hardware() {
 
       <Reveal delay={0.05}>
         <h2 className="display mt-5 text-[clamp(2rem,5.5vw,3.6rem)] leading-[1.05]">
-          I naively tried a{" "}
-          <span className="text-accent">hardware startup</span> my first year.
+          I did my own{" "}
+          <span className="text-accent">startup</span> in my first year of
+          university.
         </h2>
       </Reveal>
 
       <Reveal delay={0.1}>
         <p className="mt-7 text-lg leading-relaxed text-muted">
-          Motors, sensors, PCBs, the whole thing — first year of uni, full of
-          ambition and not much of a clue. It taught me a ton, mostly that the
-          part I loved was the software. So I&apos;ve since{" "}
+          This was a hardware startup, one I&apos;ve luckily moved on from —{" "}
           <span className="font-medium text-foreground">
-            fully transitioned to software
+            100% head first into software
           </span>{" "}
-          — and I love it.
+          now.
         </p>
       </Reveal>
     </section>

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useReducedMotion } from "framer-motion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { MapData } from "@/lib/hackathonMap";
 import { hackathons } from "@/data/content";
+import { ArrowUpRight } from "@/components/ui/icons";
 
 const BLUE = "#2b5cff";
 const CORAL = "#ff5a4d";
@@ -11,8 +12,7 @@ const INTRO = 0.08; // small lead-in before the first city lights
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
-function useInteractive() {
-  const reduce = useReducedMotion();
+function useWide() {
   const [wide, setWide] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -21,18 +21,26 @@ function useInteractive() {
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
   }, []);
-  return wide && !reduce;
+  return wide;
 }
 
+type Line = { x1: number; y1: number; x2: number; y2: number };
+
 export default function MapJourney({ data }: { data: MapData }) {
-  const interactive = useInteractive();
+  const reduce = useReducedMotion();
+  const wide = useWide();
   const n = data.pins.length;
   const outerRef = useRef<HTMLDivElement>(null);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const mapWrapRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(-1);
+  const [line, setLine] = useState<Line | null>(null);
 
-  // Scroll only advances the active city (box + colour). No zoom, no pan.
+  // Scroll advances the active city index.
   useEffect(() => {
-    if (!interactive) return;
+    if (reduce) return;
+
     const onScroll = () => {
       const outer = outerRef.current;
       if (!outer) return;
@@ -43,6 +51,7 @@ export default function MapJourney({ data }: { data: MapData }) {
       const idx = p < INTRO ? -1 : Math.min(n - 1, Math.floor(((p - INTRO) / (1 - INTRO)) * n));
       setActive((a) => (a === idx ? a : idx));
     };
+
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -50,12 +59,45 @@ export default function MapJourney({ data }: { data: MapData }) {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, [interactive, n]);
+  }, [reduce, n]);
+
+  // Connector line: measured after the DOM reflects the active card, so it
+  // never points at the previous (or collapsed/empty) card position.
+  useLayoutEffect(() => {
+    if (reduce) return;
+
+    const updateLine = () => {
+      const containerEl = stickyRef.current;
+      const mapEl = mapWrapRef.current;
+      const cardEl = cardRef.current;
+      const pin = active >= 0 ? data.pins[active] : null;
+      if (!containerEl || !mapEl || !cardEl || !pin) {
+        setLine(null);
+        return;
+      }
+      const containerRect = containerEl.getBoundingClientRect();
+      const mapRect = mapEl.getBoundingClientRect();
+      const cardRect = cardEl.getBoundingClientRect();
+      const x2 = mapRect.left + (pin.x / data.vbW) * mapRect.width - containerRect.left;
+      const y2 = mapRect.top + (pin.y / data.vbH) * mapRect.height - containerRect.top;
+      const x1 = wide
+        ? cardRect.right - containerRect.left
+        : cardRect.left + cardRect.width / 2 - containerRect.left;
+      const y1 = wide
+        ? cardRect.top + cardRect.height / 2 - containerRect.top
+        : cardRect.top - containerRect.top;
+      setLine({ x1, y1, x2, y2 });
+    };
+
+    updateLine();
+    window.addEventListener("resize", updateLine);
+    return () => window.removeEventListener("resize", updateLine);
+  }, [reduce, active, wide, data]);
 
   const current = active >= 0 ? hackathons[active] : null;
 
-  // ── mobile / reduced-motion: whole world + list ──
-  if (!interactive) {
+  // ── reduced motion: whole world + list (accessible fallback) ──
+  if (reduce) {
     return (
       <div className="mx-auto max-w-[900px] px-6">
         <div className="relative mx-auto w-[86%]" style={{ aspectRatio: `${data.vbW} / ${data.vbH}` }}>
@@ -84,60 +126,119 @@ export default function MapJourney({ data }: { data: MapData }) {
     );
   }
 
-  // ── desktop: whole world, floating in whitespace; scroll = box + colour ──
-  return (
-    <div ref={outerRef} style={{ height: `${n * 70 + 40}vh` }} className="relative">
-      <div className="sticky top-0 flex h-screen items-center justify-center overflow-hidden">
-        {/* full world, contained, lots of whitespace around it */}
-        <div
-          className="relative w-[74vw] max-w-[1180px]"
-          style={{ aspectRatio: `${data.vbW} / ${data.vbH}` }}
-        >
-          <MapLayers data={data} activeIndex={active} />
-        </div>
+  const mapWrap = (
+    <div
+      ref={mapWrapRef}
+      className="absolute inset-y-0 left-0"
+      style={{ aspectRatio: `${data.vbW} / ${data.vbH}` }}
+    >
+      <MapLayers data={data} activeIndex={active} />
+    </div>
+  );
 
-        {/* project box */}
-        <div
-          className={`absolute bottom-[13%] left-[8%] max-w-xs transition-opacity duration-300 ${
-            current ? "opacity-100" : "opacity-0"
-          }`}
+  const lineOverlay = line ? (
+    <svg className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-visible">
+      <line
+        x1={line.x1}
+        y1={line.y1}
+        x2={line.x2}
+        y2={line.y2}
+        stroke={CORAL}
+        strokeWidth={1.5}
+        strokeDasharray="3 4"
+        opacity={0.55}
+      />
+      <circle cx={line.x2} cy={line.y2} r={3} fill={CORAL} opacity={0.9} />
+    </svg>
+  ) : null;
+
+  const card = current ? (
+    <motion.div
+      key={current.city}
+      initial={{ opacity: 0, y: 14 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <p className="font-mono text-[11px] uppercase tracking-widest text-muted">
+        {current.country}
+      </p>
+      <h3 className="display mt-1 text-3xl text-ink sm:text-4xl">{current.city}</h3>
+      <p className="mt-2 text-base font-medium" style={{ color: BLUE }}>
+        {current.project}
+      </p>
+      <p className="mt-3 text-sm leading-relaxed text-muted">{current.blurb}</p>
+      {current.award ? (
+        <p
+          className="mt-3 font-mono text-[11px] font-bold uppercase tracking-wider"
+          style={{ color: CORAL }}
         >
-          {current ? (
-            <div key={current.city} className="fade-swap">
-              <p className="font-mono text-[11px] uppercase tracking-widest text-muted">
-                {current.country}
-              </p>
-              <h3 className="display mt-1 text-4xl text-ink sm:text-5xl">
-                {current.city}
-              </h3>
-              <p className="mt-2 text-base font-medium" style={{ color: BLUE }}>
-                {current.project}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-muted">
-                {current.blurb}
-              </p>
-              {current.award ? (
-                <p
-                  className="mt-3 font-mono text-[11px] font-bold uppercase tracking-wider"
-                  style={{ color: CORAL }}
-                >
-                  ★ {current.award}
-                </p>
-              ) : null}
+          ★ {current.award}
+        </p>
+      ) : null}
+      {current.link ? (
+        <a
+          href={current.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent"
+        >
+          View project <ArrowUpRight className="h-3.5 w-3.5" />
+        </a>
+      ) : null}
+    </motion.div>
+  ) : null;
+
+  const progressDots = (
+    <div className="absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+      {data.pins.map((p, i) => (
+        <span
+          key={p.city}
+          className="h-1.5 w-1.5 rounded-full transition-colors duration-300"
+          style={{ background: i <= active ? CORAL : "rgba(22,21,15,0.18)" }}
+        />
+      ))}
+    </div>
+  );
+
+  // ── wide: two-column split — card on the left, map panel on the right ──
+  if (wide) {
+    return (
+      <div ref={outerRef} style={{ height: `${n * 80 + 40}vh` }} className="relative">
+        <div ref={stickyRef} className="sticky top-0 flex h-screen w-full items-stretch overflow-hidden">
+          <div className="relative z-20 flex w-[40%] max-w-[560px] shrink-0 items-center px-[6%]">
+            <div
+              ref={cardRef}
+              className={`w-full rounded-2xl border border-border bg-background-soft/80 p-8 shadow-sm backdrop-blur-sm transition-opacity duration-300 ${
+                current ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              {card}
             </div>
-          ) : null}
+          </div>
+          <div className="relative flex-1 overflow-hidden">{mapWrap}</div>
+          {lineOverlay}
+          {progressDots}
         </div>
+      </div>
+    );
+  }
 
-        {/* progress dots */}
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 gap-2">
-          {data.pins.map((p, i) => (
-            <span
-              key={p.city}
-              className="h-1.5 w-1.5 rounded-full transition-colors duration-300"
-              style={{ background: i <= active ? CORAL : "rgba(22,21,15,0.18)" }}
-            />
-          ))}
+  // ── narrow: sticky map near the top, bordered card below it ──
+  return (
+    <div ref={outerRef} style={{ height: `${n * 70 + 30}vh` }} className="relative">
+      <div ref={stickyRef} className="sticky top-0 w-full">
+        <div className="relative h-[42vh] w-full overflow-hidden">{mapWrap}</div>
+        <div className="relative px-6 pb-8 pt-6">
+          <div
+            ref={cardRef}
+            className={`rounded-2xl border border-border bg-background-soft/80 p-6 shadow-sm backdrop-blur-sm transition-opacity duration-300 ${
+              current ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {card}
+          </div>
         </div>
+        {lineOverlay}
       </div>
     </div>
   );
