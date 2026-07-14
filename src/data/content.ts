@@ -1,11 +1,5 @@
 // All editable copy + data for the narrative page.
 
-export const vcStats = [
-  { v: "765", l: "decks I labeled by hand" },
-  { v: "80.9%", l: "model accuracy" },
-  { v: "0", l: "Python at runtime (ONNX)" },
-];
-
 export type Hackathon = {
   city: string;
   country: string;

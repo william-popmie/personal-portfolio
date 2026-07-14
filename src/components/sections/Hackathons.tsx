@@ -11,8 +11,7 @@ export default function Hackathons() {
         </Reveal>
         <Reveal delay={0.05}>
           <h2 className="display mt-5 text-[clamp(2rem,5.5vw,3.6rem)] leading-[1.05]">
-            I also really love{" "}
-            <span className="text-accent-2">hackathons</span>.
+            I love doing <span className="text-accent-2">hackathons</span>!
           </h2>
         </Reveal>
         <Reveal delay={0.1}>
