@@ -15,6 +15,7 @@ export type Hackathon = {
   lat: number;
   lng: number;
   link?: string;
+  image?: string;
 };
 
 // Order = the travel order the map pans through.
@@ -27,6 +28,7 @@ export const hackathons: Hackathon[] = [
       "A privacy layer for LLMs — it strips personal data out of prompts before they ever reach a model.",
     lat: 40.71,
     lng: -74.0,
+    image: "/hackathons/veil.jpg",
   },
   {
     city: "Berlin",
@@ -37,6 +39,7 @@ export const hackathons: Hackathon[] = [
     lat: 52.52,
     lng: 13.4,
     link: "https://zucc.it",
+    image: "/hackathons/team-zucc.jpg",
   },
   {
     city: "Stockholm",
@@ -45,6 +48,7 @@ export const hackathons: Hackathon[] = [
     blurb: "HackEurope. No trophy, but a project I'm genuinely proud of.",
     lat: 59.33,
     lng: 18.07,
+    image: "/hackathons/net-zero.jpg",
   },
   {
     city: "Belgium",
@@ -54,6 +58,7 @@ export const hackathons: Hackathon[] = [
     award: "Best Pitch",
     lat: 50.85,
     lng: 4.35,
+    image: "/hackathons/nora-ai.jpg",
   },
 ];
 
