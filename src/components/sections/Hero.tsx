@@ -10,16 +10,9 @@ export default function Hero() {
       </Reveal>
 
       <Reveal delay={0.08}>
-        <p className="mt-8 max-w-2xl text-2xl font-medium leading-snug text-ink sm:text-3xl">
-          Moving to SF to go{" "}
-          <span className="text-accent-2">100% into startups</span> - no
-          master&apos;s, no backup plan.
-        </p>
-      </Reveal>
+        <p className="mt-8 max-w-6xl text-2xl font-medium leading-snug text-ink sm:text-3xl">
+          Obsessive learner, love to build and work on <span className="text-accent-2">ambitious projects.</span>
 
-      <Reveal delay={0.16}>
-        <p className="mt-6 max-w-xl text-sm text-muted">
-          Want to work crazy hard and build big.
         </p>
       </Reveal>
 

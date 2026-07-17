@@ -11,8 +11,8 @@ export default function PlugAndPlay() {
 
       <Reveal delay={0.05}>
         <h2 className="display mt-5 text-[clamp(2rem,5.5vw,3.6rem)] leading-[1.05]">
-          Internship @ Plug and Play{" "}
-          <span className="text-accent">Tech Center</span>,
+          Internship @{" "}
+          <span className="text-accent">Plug and Play Tech Center</span>,
         </h2>
       </Reveal>
 
